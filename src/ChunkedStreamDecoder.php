@@ -54,7 +54,7 @@ class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterfa
         $this->stream->on('data', array($this, 'handleData'));
         $this->stream->on('end',  array($this, 'handleEnd'));
         Util::forwardEvents($this->stream, $this, array(
-            'error',
+            'error'
         ));
     }
 
@@ -104,6 +104,7 @@ class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterfa
                 $lengthChunk = ltrim(trim($lengthChunk), "0");
                 if ($lengthChunk === '') {
                     // We've reached the end of the stream
+echo "ChunkedStreamDecoder emit end\n";
                     $this->reachedEnd = true;
                     $this->emit('end');
                     $this->close();
@@ -178,12 +179,13 @@ class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterfa
     public function close()
     {
         $this->closed = true;
-        return $this->stream->close();
+        return true;//$this->stream->close();
     }
 
     /** @internal */
     public function handleEnd()
     {
+echo "ChunkedStreamDecoder handleEnd\n";
         $this->handleData('');
 
         if ($this->closed) {
@@ -191,6 +193,7 @@ class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterfa
         }
 
         if ($this->buffer === '' && $this->reachedEnd) {
+echo "ChunkedStreamDecoder emit end2\n";
             $this->emit('end');
             $this->close();
             return;
